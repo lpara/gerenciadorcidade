@@ -1,10 +1,14 @@
 package com.desafio.gerenciador.cidade.web;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,19 +39,33 @@ public class CidadeRestController {
 		return cidadeRepo.save(cidade);
 	}
 	
-	@DeleteMapping("/delete")
-	public boolean removerCidade(@RequestBody Cidade cidade) {
-		cidadeRepo.delete(cidade);
-		if(cidadeRepo.findById(cidade.getId()).isPresent()) {
-			return false;
+	@DeleteMapping("/delete/{id}")
+	public boolean removerCidade(@PathVariable("id") Long cidadeId) throws NoSuchElementException, Exception {
+		Optional<Cidade> cidadeOpt = cidadeRepo.findById(cidadeId);
+		if(cidadeOpt.isPresent()) {
+			Cidade cidade = cidadeOpt.get();
+			cidadeRepo.delete(cidade);
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	@GetMapping
 	public List<Cidade> buscarCidades(){
 		return cidadeRepo.findAll();
+	}
+	
+	@GetMapping("/capitais")
+	public List<Cidade> buscarCapitais(){
+		return cidadeRepo.findCapitais();
+	}
+	
+	@GetMapping("/qtdcidade/estado/{id}")
+	public Integer buscarQtdCidadesPorEstado(@PathVariable("id") Long idEstado) {
+		Map<Estado,Integer> mapaQtdCidadeEstado = cidadeRepo.contQtdCidadesPorEstado();
+		Optional<Estado> estadoSelecionadoOpt = estadoRepository.findById(idEstado);
+		return mapaQtdCidadeEstado.get(estadoSelecionadoOpt.get());
 	}
 	
 	

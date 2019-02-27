@@ -22,12 +22,13 @@ public class CidadeCustomRepositoryImpl implements CidadeCustomRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Cidade> findCapitais() {
-		String sql = "SELECT * FROM cidade c WHERE c.ativa = true AND c.capital = true";
+		String sql = "SELECT * FROM cidade c WHERE c.ativa = true AND c.capital = true ORDER BY c.nome";
 		
 		Query query = entityManager.createNativeQuery(sql);
 		return query.getResultList();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> findByEstado(String codigoUF) {
 		String sql = "SELECT * FROM cidade c "
@@ -42,10 +43,10 @@ public class CidadeCustomRepositoryImpl implements CidadeCustomRepository {
 	
 	@Override
 	public Map<Estado, Integer> contQtdCidadesPorEstado() {
-		String sql = "SELECT estado.codigoUF, count(c.id) FROM Cidade c "
+		String sql = "SELECT estado.id, estado.codigoUF, count(c.id) FROM Cidade c "
 				+ "JOIN estado estado ON estado.id=c.uf "
 				+ "WHERE c.ativa = true "
-				+ "GROUP BY estado.codigoUF" ;
+				+ "GROUP BY estado.id, estado.codigoUF" ;
 		
 		Query query = entityManager.createNativeQuery(sql);
 		List<Object[]> result = query.getResultList();
@@ -55,8 +56,9 @@ public class CidadeCustomRepositoryImpl implements CidadeCustomRepository {
 				continue;
 			}
 			Estado estado = new Estado();
-			estado.setCodigoUF((String) o[0]);
-			resultMap.put(estado, (Integer)o[1]);
+			estado.setId((Long) o[0]);
+			estado.setCodigoUF((String) o[1]);
+			resultMap.put(estado, (Integer)o[2]);
 		}
 		
 		return resultMap;
