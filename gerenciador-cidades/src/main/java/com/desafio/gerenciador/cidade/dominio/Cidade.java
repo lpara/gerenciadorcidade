@@ -14,7 +14,7 @@ public class Cidade {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	private Integer idIbge;
+	private Long idIbge;
 	
 	@ManyToOne
 	@NotNull
@@ -44,11 +44,11 @@ public class Cidade {
 		this.id = id;
 	}
 
-	public Integer getIdIbge() {
+	public Long getIdIbge() {
 		return idIbge;
 	}
 
-	public void setIdIbge(Integer idIbge) {
+	public void setIdIbge(Long idIbge) {
 		this.idIbge = idIbge;
 	}
 
