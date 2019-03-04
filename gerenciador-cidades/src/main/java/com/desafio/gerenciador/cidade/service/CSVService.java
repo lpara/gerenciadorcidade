@@ -1,12 +1,70 @@
 package com.desafio.gerenciador.cidade.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.desafio.gerenciador.cidade.dominio.Cidade;
+import com.desafio.gerenciador.cidade.dominio.Estado;
 
 public class CSVService {
 
 	private static final char SEPARADOR_PADRAO = ',';
     private static final char DELIMITADOR_CAMPO = '"';
+    private static final String CSV_PATTERN = "([\\@\\.\\w\\s\\-]*[^\\s]+(\\.(csv))$)";
+    
+    public boolean validaFormatoCSV(MultipartFile file) {
+    	Pattern pattern = Pattern.compile(CSV_PATTERN);
+        Matcher matcher = pattern.matcher(file.getOriginalFilename());
+        return matcher.matches();
+    }
+    
+    public List<String> inicioLeituraArquivo(MultipartFile file) throws IOException{
+    	String linha;
+    	List<String> listaLinhasArquivo = new ArrayList<>();
+        InputStream is = file.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        
+        while((linha = br.readLine()) != null && !linha.isEmpty()) {
+        	listaLinhasArquivo.add(linha);
+        }
+        
+        return listaLinhasArquivo;
+    }
+    
+    public List<Cidade> mapearCidadesPorLinhasCsv(List<String> linhasArquivoCsv){    	
+    	List<Cidade> result = new ArrayList<>();
+    	List<String> listaCamposCidade = new ArrayList<>();
+    	//Removendo a linha com os títulos das colunas
+    	linhasArquivoCsv.remove(0);
+    	for(String linha : linhasArquivoCsv) {
+    		listaCamposCidade = new ArrayList<>();
+    		listaCamposCidade = leitorLinhas(linha);
+    		Cidade cidadeLinha = new Cidade();
+    		cidadeLinha.setIdIbge(Long.valueOf(listaCamposCidade.get(0)));
+    		Estado estadoCidadeLinha = new Estado();
+    		estadoCidadeLinha.setCodigoUF(listaCamposCidade.get(1));
+    		cidadeLinha.setUf(estadoCidadeLinha);
+    		cidadeLinha.setNome(listaCamposCidade.get(2));
+    		cidadeLinha.setCapital(listaCamposCidade.get(3).isEmpty() ? false : true);
+    		cidadeLinha.setLongitude(listaCamposCidade.get(4));
+    		cidadeLinha.setLatitude(listaCamposCidade.get(5));
+    		cidadeLinha.setNomeAscii(listaCamposCidade.get(6));
+    		cidadeLinha.setNomeAlternativo(listaCamposCidade.get(7));
+    		cidadeLinha.setMicroregiao(listaCamposCidade.get(8));
+    		cidadeLinha.setMacroregiao(listaCamposCidade.get(9));
+    		result.add(cidadeLinha);
+    	}
+    	
+    	return result;
+    }
     
     public static List<String> leitorLinhas(String cvsLine) {
         return leitorLinhas(cvsLine, SEPARADOR_PADRAO, DELIMITADOR_CAMPO);
@@ -16,7 +74,6 @@ public class CSVService {
 
         List<String> result = new ArrayList<>();
 
-        //if empty, return!
         if (linhaCsv == null || linhaCsv.isEmpty()) {
             return result;
         }
@@ -45,7 +102,6 @@ public class CSVService {
                     aspasDentroDeCampo = false;
                 } else {
 
-                    //Fixed : allow "" in custom quote enclosed
                     if (ch == '\"') {
                         if (!aspasDentroDeCampo) {
                             curVal.append(ch);
@@ -61,12 +117,10 @@ public class CSVService {
 
                     entreAspas = true;
 
-                    //Fixed : allow "" in empty quote enclosed
                     if (chars[0] != '"' && delimitadorCampoCustom == '\"') {
                         curVal.append('"');
                     }
 
-                    //double quotes in column will hit this!
                     if (inicioConteudoCampo) {
                         curVal.append('"');
                     }
@@ -79,10 +133,8 @@ public class CSVService {
                     inicioConteudoCampo = false;
 
                 } else if (ch == '\r') {
-                    //ignore LF characters
                     continue;
                 } else if (ch == '\n') {
-                    //the end, break!
                     break;
                 } else {
                     curVal.append(ch);

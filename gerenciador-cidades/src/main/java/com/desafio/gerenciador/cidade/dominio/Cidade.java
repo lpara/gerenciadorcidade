@@ -18,7 +18,6 @@ public class Cidade {
 	private Long idIbge;
 	
 	@ManyToOne
-	@NotNull
 	@JoinColumn(name="id_estado")	
 	private Estado uf;
 
@@ -26,11 +25,11 @@ public class Cidade {
 	
 	private Boolean capital;
 	
-	private Long longitude;
+	private String longitude;
 	
-	private Long latitude;
+	private String latitude;
 	
-	private String momeAscii;
+	private String nomeAscii;
 	
 	private String nomeAlternativo;
 	
@@ -78,28 +77,28 @@ public class Cidade {
 		this.capital = capital;
 	}
 
-	public Long getLongitude() {
+	public String getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Long longitude) {
+	public void setLongitude(String longitude) {
 		this.longitude = longitude;
 	}
 
-	public Long getLatitude() {
+	public String getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Long latitude) {
+	public void setLatitude(String latitude) {
 		this.latitude = latitude;
 	}
 
-	public String getMomeAscii() {
-		return momeAscii;
+	public String getNomeAscii() {
+		return nomeAscii;
 	}
 
-	public void setMomeAscii(String momeAscii) {
-		this.momeAscii = momeAscii;
+	public void setNomeAscii(String momeAscii) {
+		this.nomeAscii = momeAscii;
 	}
 
 	public String getNomeAlternativo() {
