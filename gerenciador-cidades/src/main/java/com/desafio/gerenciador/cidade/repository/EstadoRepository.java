@@ -10,6 +10,6 @@ import com.desafio.gerenciador.cidade.dominio.Estado;
 @Repository
 public interface EstadoRepository extends JpaRepository<Estado, Long> {
 
-	@Query("select * from Estado where codigoUF = :codigoUf")
+	@Query("select estado from Estado estado where estado.codigoUF = :codigoUf")
 	public Estado findByCodUf(@Param("codigoUf") String codigoUf);
 }

@@ -22,7 +22,7 @@ public class CidadeCustomRepositoryImpl implements CidadeCustomRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Cidade> findCapitais() {
-		String sql = "SELECT * FROM cidade c WHERE c.ativa = true AND c.capital = true ORDER BY c.nome";
+		String sql = "SELECT c FROM cidade c WHERE c.ativa = true AND c.capital = true ORDER BY c.nome";
 		
 		Query query = entityManager.createNativeQuery(sql);
 		return query.getResultList();
@@ -31,7 +31,7 @@ public class CidadeCustomRepositoryImpl implements CidadeCustomRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> findByEstado(String codigoUF) {
-		String sql = "SELECT * FROM cidade c "
+		String sql = "SELECT c FROM cidade c "
 				+ "JOIN estado estado ON estado.id=c.uf "
 				+ "WHERE c.ativa = true AND estado.codigoUF = :codigoUF";
 		

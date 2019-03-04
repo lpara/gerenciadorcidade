@@ -10,7 +10,7 @@ import com.desafio.gerenciador.cidade.dominio.Cidade;
 @Repository
 public interface CidadeRepository extends JpaRepository<Cidade, Long>, CidadeCustomRepository  {
 
-	@Query("select * from Cidade c where c.idIbge = :codIbge")
+	@Query("select c from Cidade c where c.idIbge = :codIbge")
 	public Cidade findByIbge(@Param("codIbge") Long codIbge);
 	
 }
